@@ -3,20 +3,24 @@
   "description": "Sample application",
   "env": {
     "SF_CLIENT_ID": {
-        "description": "Consumer key of your Salesforce Connected App",
-        "value":""
+      "description": "Consumer key of your Salesforce Connected App",
+      "value": ""
     },
     "SF_CLIENT_SECRET": {
-        "description": "Consumer secret of your Salesforce Connected App",
-        "value":""
+      "description": "Consumer secret of your Salesforce Connected App",
+      "value": ""
     },
     "SF_USER_NAME": {
-        "description": "Salesforce username for your integration user",
-        "value":""
+      "description": "Salesforce username for your integration user",
+      "value": ""
     },
     "SF_USER_PASSWORD": {
-        "description": "Salesforce password for your integration user",
-        "value":""
+      "description": "Salesforce password for your integration user",
+      "value": ""
+    },
+    "SF_USER_SECURITY_TOKEN": {
+      "description": "Salesforce security token for your integration user",
+      "value": ""
     }
   }
 }
