@@ -11,5 +11,8 @@
     "faye": "^1.2.4",
     "nforce": "^1.7.0",
     "socket.io": "^2.0.1"
+  },
+  "devDependencies": {
+    "dotenv": "^16.0.1"
   }
 }
