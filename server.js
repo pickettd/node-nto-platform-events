@@ -1,3 +1,5 @@
+require("dotenv").config();
+
 let nforce = require("nforce");
 let faye = require("faye");
 let express = require("express");
@@ -6,8 +8,10 @@ let app = express();
 let server = require("http").Server(app);
 let io = require("socket.io")(server);
 
-let getMixes = (req, res) => {
-  let q =
+let muxJobs = [];
+
+let getMuxJobs = (req, res) => {
+  /*let q =
     "SELECT Id, Name, Account__r.Name FROM Merchandising_Mix__c WHERE Status__c='Submitted to Manufacturing'";
   org.query({ query: q }, (err, resp) => {
     if (err) {
@@ -25,10 +29,11 @@ let getMixes = (req, res) => {
       });
       res.json(prettyMixes);
     }
-  });
+  });*/
+  res.json(muxJobs);
 };
 
-let getMixDetails = (req, res) => {
+/*let getMixDetails = (req, res) => {
   let mixId = req.params.mixId;
   let q =
     "SELECT Id, Merchandise__r.Name, Merchandise__r.Price__c, Merchandise__r.Category__c, Merchandise__r.Picture_URL__c, Qty__c " +
@@ -56,13 +61,13 @@ let getMixDetails = (req, res) => {
       res.json(prettyMixItems);
     }
   });
-};
+};*/
 
-let approveMix = (req, res) => {
-  let mixId = req.params.mixId;
-  let event = nforce.createSObject("Mix_Approved__e");
-  event.set("Mix_Id__c", mixId);
-  event.set("Confirmation_Number__c", "xyz123");
+let approveMuxJob = (req, res) => {
+  //   let mixId = req.params.muxId;
+  let event = nforce.createSObject("MUX_Inbound__e");
+  //event.set("Mix_Id__c", mixId);
+  //event.set("Confirmation_Number__c", "xyz123");
   org.insert({ sobject: event }, (err) => {
     if (err) {
       console.error(err);
@@ -77,9 +82,9 @@ let PORT = process.env.PORT || 5000;
 
 app.use(cors());
 app.use("/", express.static(__dirname + "/www"));
-app.get("/mixes", getMixes);
-app.get("/mixes/:mixId", getMixDetails);
-app.post("/approvals/:mixId", approveMix);
+app.get("/mux-jobs", getMuxJobs);
+// app.get("/mux-jobs/:mixId", getMixDetails);
+app.post("/approvals/:muxId", approveMuxJob);
 
 let bayeux = new faye.NodeAdapter({ mount: "/faye", timeout: 45 });
 bayeux.attach(server);
@@ -127,18 +132,20 @@ org.authenticate(
 let subscribeToPlatformEvents = () => {
   var client = new faye.Client(org.oauth.instance_url + "/cometd/40.0/");
   client.setHeader("Authorization", "OAuth " + org.oauth.access_token);
-  client.subscribe("/event/Mix_Submitted__e", function (message) {
+  client.subscribe("/event/MUX_Outbound__e", function (message) {
+    console.log("Received MUX_Outbound__e event");
+    const muxJob = {
+      amount: message.payload.Amount__c,
+      msgId: message.payload.MUX_Job_ID__c,
+    };
+    muxJobs.push(muxJob);
     // Send message to all connected Socket.io clients
-    io.of("/").emit("mix_submitted", {
-      mixId: message.payload.Mix_Id__c,
-      mixName: message.payload.Mix_Name__c,
-      account: message.payload.Account__c,
-    });
+    io.of("/").emit("mux_outbound", muxJob);
   });
-  client.subscribe("/event/Mix_Unsubmitted__e", function (message) {
+  /*client.subscribe("/event/MUX_Inbound__e", function (message) {
     // Send message to all connected Socket.io clients
-    io.of("/").emit("mix_unsubmitted", {
-      mixId: message.payload.Mix_Id__c,
+    io.of("/").emit("mux_inbound", {
+      jobId: message.payload.MUX_Job_ID__c,
     });
-  });
+  });*/
 };
