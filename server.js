@@ -11,63 +11,66 @@ let io = require("socket.io")(server);
 let muxJobs = [];
 
 let getMuxJobs = (req, res) => {
-  /*let q =
-    "SELECT Id, Name, Account__r.Name FROM Merchandising_Mix__c WHERE Status__c='Submitted to Manufacturing'";
-  org.query({ query: q }, (err, resp) => {
+  // q is some SOQL query
+  /*let q ="";
+    org.query({ query: q }, (err, resp) => {
     if (err) {
       console.log(err);
       res.sendStatus(500);
     } else {
-      let mixes = resp.records;
-      let prettyMixes = [];
-      mixes.forEach((mix) => {
-        prettyMixes.push({
-          mixId: mix.get("Id"),
-          mixName: mix.get("Name"),
-          account: mix.get("Account__r").Name,
+      let soqlJobs = resp.records;
+      let returnJobs = [];
+      soqlJobs.forEach((soqlJob) => {
+        returnJobs.push({
+          jobId: soqlJob.get("Id"),
+          amount: soqlJob.get("Amount"),
         });
       });
-      res.json(prettyMixes);
+      res.json(returnJobs);
     }
   });*/
   res.json(muxJobs);
 };
 
-/*let getMixDetails = (req, res) => {
-  let mixId = req.params.mixId;
-  let q =
-    "SELECT Id, Merchandise__r.Name, Merchandise__r.Price__c, Merchandise__r.Category__c, Merchandise__r.Picture_URL__c, Qty__c " +
-    "FROM Mix_Item__c " +
-    "WHERE Merchandising_Mix__c = '" +
-    mixId +
-    "'";
+/*let getJobDetails = (req, res) => {
+  let jobId = req.params.jobId;
+  // q is some SOQL query across multiple objects maybe
+  let q ="";
   org.query({ query: q }, (err, resp) => {
     if (err) {
       console.log(err);
       res.sendStatus(500);
     } else {
-      let mixItems = resp.records;
-      let prettyMixItems = [];
-      mixItems.forEach((mixItem) => {
-        prettyMixItems.push({
-          productName: mixItem.get("Merchandise__r").Name,
-          price: mixItem.get("Merchandise__r").Price__c,
-          pictureURL: mixItem.get("Merchandise__r").Picture_URL__c,
-          mixId: mixItem.get("Id"),
-          productId: mixItem.get("Merchandise__r"),
-          qty: mixItem.get("Qty__c"),
+      let soqlItems = resp.records;
+      let returnItems = [];
+      soqlItems.forEach((soqlItem) => {
+        returnItems.push({
+          jobId: soqlItem.get("Id"),
         });
       });
-      res.json(prettyMixItems);
+      res.json(returnItems);
     }
   });
 };*/
 
-let approveMuxJob = (req, res) => {
-  //   let mixId = req.params.muxId;
+let sendMuxInbound = (req, res) => {
+  //   let jobId = req.params.jobId;
   let event = nforce.createSObject("MUX_Inbound__e");
-  //event.set("Mix_Id__c", mixId);
-  //event.set("Confirmation_Number__c", "xyz123");
+  //event.set("MUX_Job_ID__c", jobId);
+  org.insert({ sobject: event }, (err) => {
+    if (err) {
+      console.error(err);
+      res.sendStatus(500);
+    } else {
+      res.sendStatus(200);
+    }
+  });
+};
+
+let sendMuxJobStatus = (req, res) => {
+  //   let jobId = req.params.jobId;
+  let event = nforce.createSObject("MUX_Inbound_Job_Status__e");
+  //event.set("MUX_Job_ID__c", jobId);
   org.insert({ sobject: event }, (err) => {
     if (err) {
       console.error(err);
@@ -83,8 +86,9 @@ let PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use("/", express.static(__dirname + "/www"));
 app.get("/mux-jobs", getMuxJobs);
-// app.get("/mux-jobs/:mixId", getMixDetails);
-app.post("/approvals/:muxId", approveMuxJob);
+// app.get("/mux-jobs/:jobId", getJobDetails);
+app.post("/send-inbound/:jobId", sendMuxInbound);
+app.post("/send-status/:jobId", sendMuxJobStatus);
 
 let bayeux = new faye.NodeAdapter({ mount: "/faye", timeout: 45 });
 bayeux.attach(server);
