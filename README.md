@@ -14,3 +14,4 @@ Follow the instructions below to deploy your own instance of the application:
    - For **SF_CLIENT_SECRET**, enter the Consumer Secret of your Salesforce Connected App
    - For **SF_USER_NAME**, enter the the username of your Salesforce user
    - For **SF_USER_PASSWORD**, enter the the password of your Salesforce user
+   - FOR **SF_USER_SECURITY_TOKEN**, enter the security token for the Salesforce user
