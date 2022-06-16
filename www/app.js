@@ -1,72 +1,75 @@
 var content = document.getElementById("content");
 var jobs;
 
-function renderMuxList() {
+function renderJobList() {
   var html = "";
-  jobs.forEach(function (mux) {
-    html = html + '<div class="row">' + renderMux(mux) + "</div>";
+  jobs.forEach(function (job) {
+    html = html + '<div class="row">' + renderJob(job) + "</div>";
   });
   content.innerHTML = html;
 }
 
-function renderMux(mux, isAnimated) {
+function renderJob(job, isAnimated) {
   return `
         <div class="col-sm-12">
             <div class="panel panel-primary ${isAnimated ? "animateIn" : ""}">
-                <div class="panel-heading">Mux Job ID: ${mux.msgId}</div>
+                <div class="panel-heading">Mux Job ID: ${job.muxJobId}</div>
                 <div class="panel-body">
                     <div class="col-md-12 col-lg-7">
                         <table>
                             <tr>
                                 <td class="panel-table-label">Amount:</td><td>${
-                                  mux.amount
+                                  job.amount
                                 }</td>
                             </tr>
                         </table>
                     </div>   
                     <div class="col-md-12 col-lg-5">
-                        <button class="btn btn-info" onclick="approveMux('${
-                          mux.msgId
+                        <button class="btn btn-info" onclick="sendMuxInbound('${
+                          job.muxJobId
                         }')">
                             <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
-                            Mark Complete
+                            Send Mux Inbound
+                        </button>
+                        <button class="btn btn-info" onclick="sendMuxJobStatus('${
+                          job.muxJobId
+                        }')">
+                            <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
+                            Send Mux Status
                         </button>
                     </div>
-                    <div id="details-${mux.msgId}" class="col-md-12"></div>
+                    <div id="details-${job.muxJobId}" class="col-md-12"></div>
                 </div>
             </div>
         </div>`;
 }
 
-// Render the details for a mux
-/*function renderMuxDetails(mux, items) {
+// Render the details for a job
+/*function renderJobDetails(job, items) {
   var html = `
         <table class="table">
             <tr>
-                <th colspan="2">Product</th>
-                <th>MSRP</th>
-                <th>Qty</th>
+                <th colspan="2">Job Detail 1?</th>
+                <th colspan="2">Job Detail 2?</th>
             </tr>`;
   items.forEach(function (item) {
     html =
       html +
       `
             <tr>
-                <td><img src="${item.pictureURL}" style="height:50px"/></td>
-                <td>${item.productName}</td>
-                <td>$${item.price}</td>
-                <td>${item.qty}</td>
+                <td>${item.jobDetailLine1}</td>
+                <td>${item.jobDetailLine2}</td>
             </tr>`;
   });
   html = html + "</table>";
-  var details = document.getElementById("details-" + mux.msgId);
+  var details = document.getElementById("details-" + job.muxJobId);
   details.innerHTML = html;
 }*/
 
-function deleteMux(msgId) {
+function deleteMux(muxJobId) {
   var index = jobs.length - 1;
   while (index >= 0) {
-    if (jobs[index].msgId === msgId) {
+    if (jobs[index].muxJobId === muxJobId) {
       jobs.splice(index, 1);
     }
     index -= 1;
@@ -79,7 +82,7 @@ socket.on("mux_outbound", function (newMux) {
   // if the mix is alresdy in the list: do nothing
   var exists = false;
   jobs.forEach((job) => {
-    if (job.msgId == newMux.msgId) {
+    if (job.muxJobId == newMux.muxJobId) {
       exists = true;
     }
   });
@@ -93,13 +96,8 @@ socket.on("mux_outbound", function (newMux) {
   }
 });
 
-/*socket.on("mix_unsubmitted", function (data) {
-  deleteMux(data.msgId);
-  renderMixList();
-});*/
-
 // Retrieve the existing list of jobs from Node server
-function getMuxList() {
+function getJobList() {
   var xhr = new XMLHttpRequest(),
     method = "GET",
     url = "/mux-jobs";
@@ -107,49 +105,63 @@ function getMuxList() {
   xhr.open(method, url, true);
   xhr.onload = function () {
     jobs = JSON.parse(xhr.responseText);
-    renderMuxList();
+    renderJobList();
   };
   xhr.send();
 }
 
 // Retrieve the merchandise list for a mix from Node server
-/*function getMuxDetails(msgId) {
-  var details = document.getElementById("details-" + msgId);
+/*function getMuxDetails(muxJobId) {
+  var details = document.getElementById("details-" + muxJobId);
   if (details.innerHTML != "") {
     details.innerHTML = "";
     return;
   }
   var mux;
   for (var i = 0; i < jobs.length; i++) {
-    if ((jobs[i].msgId = msgId)) {
+    if ((jobs[i].muxJobId = muxJobId)) {
       mux = jobs[i];
       break;
     }
   }
   var xhr = new XMLHttpRequest(),
     method = "GET",
-    url = "/jobs/" + msgId;
+    url = "/jobs/" + muxJobId;
 
   xhr.open(method, url, true);
   xhr.onload = function () {
     var items = JSON.parse(xhr.responseText);
-    renderMuxDetails(mix, items);
+    renderJobDetails(mix, items);
   };
   xhr.send();
 }*/
 
-// Post approve message to Node server
-function approveMux(msgId) {
+// Post inbound message to Node server
+function sendMuxInbound(jobId) {
   var xhr = new XMLHttpRequest(),
     method = "POST",
-    url = "/approvals/" + msgId;
+    url = "/send-inbound/" + jobId;
 
   xhr.open(method, url, true);
   xhr.onload = function () {
-    deleteMux(msgId);
-    renderMuxList();
+    deleteMux(jobId);
+    renderJobList();
   };
   xhr.send();
 }
 
-getMuxList();
+// Post status message to Node server
+function sendMuxJobStatus(jobId) {
+  var xhr = new XMLHttpRequest(),
+    method = "POST",
+    url = "/send-status/" + jobId;
+
+  xhr.open(method, url, true);
+  xhr.onload = function () {
+    deleteMux(jobId);
+    renderJobList();
+  };
+  xhr.send();
+}
+
+getJobList();

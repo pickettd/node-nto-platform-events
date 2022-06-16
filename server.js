@@ -140,16 +140,10 @@ let subscribeToPlatformEvents = () => {
     console.log("Received MUX_Outbound__e event");
     const muxJob = {
       amount: message.payload.Amount__c,
-      msgId: message.payload.MUX_Job_ID__c,
+      muxJobId: message.payload.MUX_Job_ID__c,
     };
     muxJobs.push(muxJob);
     // Send message to all connected Socket.io clients
     io.of("/").emit("mux_outbound", muxJob);
   });
-  /*client.subscribe("/event/MUX_Inbound__e", function (message) {
-    // Send message to all connected Socket.io clients
-    io.of("/").emit("mux_inbound", {
-      jobId: message.payload.MUX_Job_ID__c,
-    });
-  });*/
 };
