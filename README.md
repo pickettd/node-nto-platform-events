@@ -9,7 +9,7 @@ Follow the instructions below to deploy your own instance of the application:
 
    [![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
 
-Note - if you get an error from Heroku when trying to deploy using the the above button, an alternative procedure is to fork this repo on Github, then after the fork is complete, you can go to the following url instead (replace the <your-github-username> with your username): https://heroku.com/deploy?template=https://github.com/<your-github-username>/node-nto-platform-events
+Note - if you get an error from Heroku when trying to deploy using the the above button, an alternative procedure is to fork this repo on Github, then after the fork is complete, you can go to the following url instead (replace the %your-github-username% with your username): https://heroku.com/deploy?template=https://github.com/%your-github-username%/node-nto-platform-events
 
 1. Fill in the config variables as follows:
    - For **SF_CLIENT_ID**, enter the Consumer Key of your Salesforce Connected App
