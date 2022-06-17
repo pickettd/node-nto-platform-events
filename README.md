@@ -13,7 +13,7 @@
    - Write down the Consumer Key and the Consumer Secret of your connected app
 - Create a password for the default user
    - $ sfdx force:user:password:generate
-- [Create a security token the default user](https://help.salesforce.com/s/articleView?id=sf.user_security_token.htm&type=5)
+- [Create a security token for the default user](https://help.salesforce.com/s/articleView?id=sf.user_security_token.htm&type=5)
 - Then follow the instructions below to get the code from this repo running on Heroku (or your local machine if you would rather use Node directly)
 
 
