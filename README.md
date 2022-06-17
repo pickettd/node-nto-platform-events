@@ -32,6 +32,6 @@ Note - if you get an error from Heroku when trying to deploy using the the above
    - For **SF_CLIENT_SECRET**, enter the Consumer Secret of your Salesforce Connected App
    - For **SF_USER_NAME**, enter the the username of your Salesforce user
    - For **SF_USER_PASSWORD**, enter the the password of your Salesforce user
-   - FOR **SF_USER_SECURITY_TOKEN**, enter the security token for the Salesforce user
+   - For **SF_USER_SECURITY_TOKEN**, enter the security token for the Salesforce user
 
 Read [original blog post](https://developer.salesforce.com/blogs/developer-relations/2017/07/northern-trail-outfitters-new-sample-application-lightning-components-platform-events-salesforce-dx) and [followup blog post](https://developer.salesforce.com/blogs/developer-relations/2017/07/northern-trail-sample-app-part-2-salesforce-node-js-integration-platform-events) for more information.
