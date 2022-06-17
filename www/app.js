@@ -78,20 +78,20 @@ function deleteMux(muxJobId) {
 
 var socket = io.connect();
 
-socket.on("mux_outbound", function (newMux) {
-  // if the mix is alresdy in the list: do nothing
+socket.on("mux_outbound", function (newMuxJob) {
+  // if the job is alresdy in the list: do nothing
   var exists = false;
   jobs.forEach((job) => {
-    if (job.muxJobId == newMux.muxJobId) {
+    if (job.muxJobId == newMuxJob.muxJobId) {
       exists = true;
     }
   });
-  // if the mix is not in the list: add it
+  // if the job is not in the list: add it
   if (!exists) {
-    jobs.push(newMux);
+    jobs.push(newMuxJob);
     var el = document.createElement("div");
     el.className = "row";
-    el.innerHTML = renderMix(newMux, true);
+    el.innerHTML = renderJob(newMuxJob, true);
     content.insertBefore(el, content.firstChild);
   }
 });
@@ -110,7 +110,7 @@ function getJobList() {
   xhr.send();
 }
 
-// Retrieve the merchandise list for a mix from Node server
+// Retrieve the details from Node server
 /*function getMuxDetails(muxJobId) {
   var details = document.getElementById("details-" + muxJobId);
   if (details.innerHTML != "") {
