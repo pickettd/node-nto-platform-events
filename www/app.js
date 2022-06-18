@@ -29,13 +29,13 @@ function renderJob(job, isAnimated) {
                           job.muxJobId
                         }')">
                             <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
-                            Send Mux Inbound
+                            Send Exception
                         </button>
                         <button class="btn btn-info" onclick="sendMuxJobStatus('${
                           job.muxJobId
                         }')">
                             <span class="glyphicon glyphicon-ok" aria-hidden="true"></span>
-                            Send Mux Status
+                            Send Status
                         </button>
                     </div>
                     <div id="details-${job.muxJobId}" class="col-md-12"></div>
