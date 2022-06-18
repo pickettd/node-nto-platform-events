@@ -53,10 +53,11 @@ let getMuxJobs = (req, res) => {
   });
 };*/
 
-let sendMuxInbound = (req, res) => {
-  //   let jobId = req.params.jobId;
+let sendMuxInboundException = (req, res) => {
+  let jobId = req.params.jobId;
   let event = nforce.createSObject("MUX_Inbound__e");
-  //event.set("MUX_Job_ID__c", jobId);
+  event.set("MUX_Job_ID__c", jobId);
+  event.set("Error_Message__c", "This job is exceptional");
   org.insert({ sobject: event }, (err) => {
     if (err) {
       console.error(err);
@@ -68,9 +69,9 @@ let sendMuxInbound = (req, res) => {
 };
 
 let sendMuxJobStatus = (req, res) => {
-  //   let jobId = req.params.jobId;
+  let jobId = req.params.jobId;
   let event = nforce.createSObject("MUX_Inbound_Job_Status__e");
-  //event.set("MUX_Job_ID__c", jobId);
+  event.set("MUX_Job_ID__c", jobId);
   org.insert({ sobject: event }, (err) => {
     if (err) {
       console.error(err);
@@ -87,7 +88,7 @@ app.use(cors());
 app.use("/", express.static(__dirname + "/www"));
 app.get("/mux-jobs", getMuxJobs);
 // app.get("/mux-jobs/:jobId", getJobDetails);
-app.post("/send-inbound/:jobId", sendMuxInbound);
+app.post("/send-inbound/:jobId", sendMuxInboundException);
 app.post("/send-status/:jobId", sendMuxJobStatus);
 
 let bayeux = new faye.NodeAdapter({ mount: "/faye", timeout: 45 });
