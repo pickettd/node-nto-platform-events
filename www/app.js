@@ -1,8 +1,8 @@
-var content = document.getElementById("content");
-var jobs;
+let content = document.getElementById("content");
+let jobs;
 
 function renderJobList() {
-  var html = "";
+  let html = "";
   jobs.forEach(function (job) {
     html = html + '<div class="row">' + renderJob(job) + "</div>";
   });
@@ -46,7 +46,7 @@ function renderJob(job, isAnimated) {
 
 // Render the details for a job
 /*function renderJobDetails(job, items) {
-  var html = `
+  let html = `
         <table class="table">
             <tr>
                 <th colspan="2">Job Detail 1?</th>
@@ -62,12 +62,12 @@ function renderJob(job, isAnimated) {
             </tr>`;
   });
   html = html + "</table>";
-  var details = document.getElementById("details-" + job.muxJobId);
+  let details = document.getElementById("details-" + job.muxJobId);
   details.innerHTML = html;
 }*/
 
 function deleteMux(muxJobId) {
-  var index = jobs.length - 1;
+  let index = jobs.length - 1;
   while (index >= 0) {
     if (jobs[index].muxJobId === muxJobId) {
       jobs.splice(index, 1);
@@ -76,11 +76,11 @@ function deleteMux(muxJobId) {
   }
 }
 
-var socket = io.connect();
+let socket = io.connect();
 
 socket.on("mux_outbound", function (newMuxJob) {
   // if the job is alresdy in the list: do nothing
-  var exists = false;
+  let exists = false;
   jobs.forEach((job) => {
     if (job.muxJobId == newMuxJob.muxJobId) {
       exists = true;
@@ -89,7 +89,7 @@ socket.on("mux_outbound", function (newMuxJob) {
   // if the job is not in the list: add it
   if (!exists) {
     jobs.push(newMuxJob);
-    var el = document.createElement("div");
+    let el = document.createElement("div");
     el.className = "row";
     el.innerHTML = renderJob(newMuxJob, true);
     content.insertBefore(el, content.firstChild);
@@ -98,7 +98,7 @@ socket.on("mux_outbound", function (newMuxJob) {
 
 // Retrieve the existing list of jobs from Node server
 function getJobList() {
-  var xhr = new XMLHttpRequest(),
+  let xhr = new XMLHttpRequest(),
     method = "GET",
     url = "/mux-jobs";
 
@@ -112,25 +112,25 @@ function getJobList() {
 
 // Retrieve the details from Node server
 /*function getMuxDetails(muxJobId) {
-  var details = document.getElementById("details-" + muxJobId);
+  let details = document.getElementById("details-" + muxJobId);
   if (details.innerHTML != "") {
     details.innerHTML = "";
     return;
   }
-  var mux;
-  for (var i = 0; i < jobs.length; i++) {
+  let mux;
+  for (let i = 0; i < jobs.length; i++) {
     if ((jobs[i].muxJobId = muxJobId)) {
       mux = jobs[i];
       break;
     }
   }
-  var xhr = new XMLHttpRequest(),
+  let xhr = new XMLHttpRequest(),
     method = "GET",
     url = "/jobs/" + muxJobId;
 
   xhr.open(method, url, true);
   xhr.onload = function () {
-    var items = JSON.parse(xhr.responseText);
+    let items = JSON.parse(xhr.responseText);
     renderJobDetails(mix, items);
   };
   xhr.send();
@@ -138,7 +138,7 @@ function getJobList() {
 
 // Post inbound message to Node server
 function sendMuxInbound(jobId) {
-  var xhr = new XMLHttpRequest(),
+  let xhr = new XMLHttpRequest(),
     method = "POST",
     url = "/send-inbound/" + jobId;
 
@@ -152,7 +152,7 @@ function sendMuxInbound(jobId) {
 
 // Post status message to Node server
 function sendMuxJobStatus(jobId) {
-  var xhr = new XMLHttpRequest(),
+  let xhr = new XMLHttpRequest(),
     method = "POST",
     url = "/send-status/" + jobId;
 
