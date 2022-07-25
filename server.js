@@ -4,11 +4,15 @@ let nforce = require("nforce");
 let faye = require("faye");
 let express = require("express");
 let cors = require("cors");
+const e = require("express");
 let app = express();
 let server = require("http").Server(app);
 let io = require("socket.io")(server);
 
 let muxJobs = [];
+function delay(time) {
+  return new Promise((resolve) => setTimeout(resolve, time));
+}
 
 let getMuxJobs = (req, res) => {
   // q is some SOQL query
@@ -64,6 +68,27 @@ let sendMuxInboundException = (req, res) => {
       res.sendStatus(500);
     } else {
       res.sendStatus(200);
+    }
+  });
+};
+
+// Can create MUX_Inbound_Job_Status__e or MUX_Inbound__e types
+const createPlatformEvent = async (jobId, event_type, msgTxt) => {
+  let event = nforce.createSObject(event_type);
+  event.set("MUX_Job_ID__c", jobId);
+  if (event_type === "MUX_Inbound_Job_Status__e") {
+    event.set("Status__c", msgTxt);
+  } else if (event_type === "MUX_Inbound__e") {
+    event.set("Error_Message__c", msgTxt);
+  } else {
+    return null;
+  }
+  return org.insert({ sobject: event }, (err) => {
+    if (err) {
+      console.error(err);
+      return null;
+    } else {
+      return event;
     }
   });
 };
@@ -139,12 +164,39 @@ let subscribeToPlatformEvents = () => {
   client.setHeader("Authorization", "OAuth " + org.oauth.access_token);
   client.subscribe("/event/MUX_Outbound__e", function (message) {
     console.log("Received MUX_Outbound__e event");
+    const muxJobId = message.payload.MUX_Job_ID__c;
+    const amount = message.payload.Amount__c;
     const muxJob = {
-      amount: message.payload.Amount__c,
-      muxJobId: message.payload.MUX_Job_ID__c,
+      amount,
+      muxJobId,
     };
     muxJobs.push(muxJob);
+    // Respond to event queue that job is pending
+    createPlatformEvent(muxJobId, "MUX_Inbound_Job_Status__e", "Pending");
+
     // Send message to all connected Socket.io clients
     io.of("/").emit("mux_outbound", muxJob);
+    delay(5000).then(() => {
+      // console.log("ran after 5 second passed");
+      if (amount == 13.37) {
+        // In our demo, if amount is 1337 then we'll say that is a duplicate check number
+        console.log("sending dupe check number exception for id", muxJobId);
+        createPlatformEvent(
+          muxJobId,
+          "MUX_Inbound__e",
+          "Duplicate Check Number"
+        );
+      } else if (amount == 10.01) {
+        // In our demo, if amount is 10.01 then we'll say that is a duplicate payment
+        console.log("sending dupe payment exception for id", muxJobId);
+        createPlatformEvent(
+          muxJobId,
+          "MUX_Inbound__e",
+          "Duplicate Payment Detected"
+        );
+      } else {
+        createPlatformEvent(muxJobId, "MUX_Inbound_Job_Status__e", "Completed");
+      }
+    });
   });
 };
