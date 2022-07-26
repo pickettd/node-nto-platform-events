@@ -186,6 +186,7 @@ let subscribeToPlatformEvents = () => {
           "MUX_Inbound__e",
           "Duplicate Check Number"
         );
+        createPlatformEvent(muxJobId, "MUX_Inbound_Job_Status__e", "Exception");
       } else if (amount == 10.01) {
         // In our demo, if amount is 10.01 then we'll say that is a duplicate payment
         console.log("sending dupe payment exception for id", muxJobId);
@@ -194,6 +195,7 @@ let subscribeToPlatformEvents = () => {
           "MUX_Inbound__e",
           "Duplicate Payment Detected"
         );
+        createPlatformEvent(muxJobId, "MUX_Inbound_Job_Status__e", "Exception");
       } else {
         createPlatformEvent(muxJobId, "MUX_Inbound_Job_Status__e", "Completed");
       }
