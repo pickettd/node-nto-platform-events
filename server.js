@@ -74,11 +74,14 @@ let sendMuxInboundException = (req, res) => {
 
 // Can create MUX_Inbound_Job_Status__e or MUX_Inbound__e types
 const createPlatformEvent = async (jobId, event_type, msgTxt) => {
+  let messageField = "";
   let event = nforce.createSObject(event_type);
   event.set("MUX_Job_ID__c", jobId);
   if (event_type === "MUX_Inbound_Job_Status__e") {
+    messageField = "Status__c";
     event.set("Status__c", msgTxt);
   } else if (event_type === "MUX_Inbound__e") {
+    messageField = "Error_Message__c";
     event.set("Error_Message__c", msgTxt);
   } else {
     return null;
@@ -88,6 +91,16 @@ const createPlatformEvent = async (jobId, event_type, msgTxt) => {
       console.error(err);
       return null;
     } else {
+      console.log(
+        "Successfully created event in SF, event_type is",
+        event_type,
+        "mux job id is",
+        jobId,
+        "field in event is",
+        messageField,
+        "and msg text is",
+        msgTxt
+      );
       return event;
     }
   });
