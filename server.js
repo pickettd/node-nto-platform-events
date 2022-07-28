@@ -179,8 +179,10 @@ let subscribeToPlatformEvents = () => {
     console.log("Received MUX_Outbound__e event");
     const muxJobId = message.payload.MUX_Job_ID__c;
     const amount = message.payload.Amount__c;
+    const checkNumber = message.payload.Check_Number__c;
     const muxJob = {
       amount,
+      checkNumber,
       muxJobId,
     };
     muxJobs.push(muxJob);
@@ -191,8 +193,12 @@ let subscribeToPlatformEvents = () => {
     io.of("/").emit("mux_outbound", muxJob);
     delay(5000).then(() => {
       // console.log("ran after 5 second passed");
-      if (amount == 13.37) {
-        // In our demo, if amount is 1337 then we'll say that is a duplicate check number
+      
+      //Tuesday Demo Code, if amount is 1337 then we'll say that is a duplicate check number
+      //if (amount == 13.37) {
+      
+      //July 28 - Duplicate Check Code, if check  number is 666, then we'll say that is a duplicate check number
+      if ( checkNumber == "666" ) {
         console.log("sending dupe check number exception for id", muxJobId);
         createPlatformEvent(
           muxJobId,
