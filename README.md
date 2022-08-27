@@ -8,7 +8,7 @@
   - API Name: Node_Mux_Toy
   - Contact Email: enter your email address
   - Enabled OAuth Settings: Checked
-  - Callback URL: http://localhost:3000/oauth/\_callback
+  - Callback URL: http://localhost:3000/oauth/_callback
   - Selected OAuth Scopes: Full Access (full)
   - Click Save
   - Write down the Consumer Key and the Consumer Secret of your connected app
